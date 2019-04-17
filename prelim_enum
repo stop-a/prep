@@ -9,6 +9,7 @@
 #                                                                             #
 # 1.1a: Fixed version number, fixed nikto syntax                              #
 # 1.2a: Spawn gobuster out, add spawning out full nmap                        #
+# 1.3a: Fixed some missing -Pn flags for nmap                                 #
 #                                                                             #
 ###############################################################################
 	# Pass comma separated list of IP address to script for enumeration.
@@ -16,7 +17,6 @@
 
 	# TODO
 	#  - get mail
-	#  - SEE OneNote...
 
 ###############################################################################
 #                                                                             #
@@ -72,7 +72,7 @@ enum_smb () {
 	for s in ${scripts} ; do 
 		printf "Executing on ${s}\n"
 		sleep 10
-		nmap -v -p ${portlist} -oA ${h}/${s}.out -T3 --script=smb-vuln-${s} ${h} 2>&1>/dev/null
+		nmap -v -p ${portlist} -oA ${h}/${s}.out -Pn -T3 --script=smb-vuln-${s} ${h} 2>&1>/dev/null
 		enum4linux ${h} > ${h}/${enum4linux}.out
 	done
 }
@@ -84,7 +84,7 @@ enum_smb () {
 ###############################################################################
 enum_web () {
 	portlist="80,8000,8080,443,8443"
-	nmap -v -p ${portlist} -oA ${h}/${h}_http_test.out -T4 ${h}
+	nmap -v -p ${portlist} -Pn -oA ${h}/${h}_http_test.out -T4 ${h}
 	
 	# Process gnmap file and kick off nikto scan
 	results=$(grep Ports ${h}/${h}_http_test.out.gnmap | awk -F: '{print $3}' \
